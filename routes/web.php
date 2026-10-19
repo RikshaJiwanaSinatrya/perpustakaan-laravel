@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-require __DIR__ . '/mock.php';
+require __DIR__.'/mock.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ Route::get('/buku', function () {
 Route::get('/buku/{id}', function (int $id) {
     $buku = mock_buku_by_id($id);
 
-    if (!$buku) {
+    if (! $buku) {
         abort(404);
     }
 
@@ -71,6 +71,7 @@ Route::get('/login', function () {
     if (current_user()) {
         return redirect(current_user()['role'] === 'admin' ? '/admin' : '/pinjaman');
     }
+
     return view('auth.login');
 })->name('login');
 
@@ -86,20 +87,21 @@ Route::post('/login', function () {
         }
     }
 
-    if (!$user) {
+    if (! $user) {
         return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
     }
 
     session(['mock_user' => $user]);
 
     return redirect($user['role'] === 'admin' ? '/admin' : '/pinjaman')
-        ->with('sukses', 'Selamat datang, ' . $user['nama'] . '!');
+        ->with('sukses', 'Selamat datang, '.$user['nama'].'!');
 });
 
 Route::get('/register', function () {
     if (current_user()) {
         return redirect('/');
     }
+
     return view('auth.register');
 })->name('register');
 
@@ -130,7 +132,7 @@ Route::post('/register', function () {
         'nama' => trim((string) request('nama')),
         'email' => $email,
         'role' => 'anggota',
-        'no_anggota' => 'AGT-' . str_pad((string) count(array_filter($users, fn ($u) => $u['role'] === 'anggota')) + 1, 4, '0', STR_PAD_LEFT),
+        'no_anggota' => 'AGT-'.str_pad((string) count(array_filter($users, fn ($u) => $u['role'] === 'anggota')) + 1, 4, '0', STR_PAD_LEFT),
         'bergabung' => date('Y-m-d'),
         'password' => (string) request('password'),
     ];
@@ -139,11 +141,12 @@ Route::post('/register', function () {
     mock_save_pengguna($users);
     session(['mock_user' => $user]);
 
-    return redirect('/pinjaman')->with('sukses', 'Registrasi berhasil. Selamat datang, ' . $user['nama'] . '!');
+    return redirect('/pinjaman')->with('sukses', 'Registrasi berhasil. Selamat datang, '.$user['nama'].'!');
 });
 
 Route::post('/logout', function () {
     session()->forget('mock_user');
+
     return redirect('/')->with('sukses', 'Anda telah keluar.');
 })->name('logout');
 
@@ -156,7 +159,7 @@ Route::post('/logout', function () {
 Route::get('/pinjaman', function () {
     $user = current_user();
 
-    if (!$user) {
+    if (! $user) {
         return redirect('/login');
     }
 
@@ -172,18 +175,18 @@ Route::get('/pinjaman', function () {
 Route::post('/pinjaman/{id}', function (int $id) {
     $user = current_user();
 
-    if (!$user) {
+    if (! $user) {
         return redirect('/login');
     }
 
     $buku = mock_buku_by_id($id);
 
-    if (!$buku) {
+    if (! $buku) {
         abort(404);
     }
 
     if (mock_stok_tersedia($buku) <= 0) {
-        return back()->with('galat', 'Stok "' . $buku['judul'] . '" sedang habis.');
+        return back()->with('galat', 'Stok "'.$buku['judul'].'" sedang habis.');
     }
 
     $loans = mock_peminjaman_state();
@@ -204,13 +207,13 @@ Route::post('/pinjaman/{id}', function (int $id) {
     ];
     mock_save_peminjaman($loans);
 
-    return redirect('/pinjaman')->with('sukses', 'Berhasil meminjam "' . $buku['judul'] . '". Kembali tanggal ' . mock_tanggal(date('Y-m-d', strtotime('+7 days'))) . '.');
+    return redirect('/pinjaman')->with('sukses', 'Berhasil meminjam "'.$buku['judul'].'". Kembali tanggal '.mock_tanggal(date('Y-m-d', strtotime('+7 days'))).'.');
 })->where('id', '[0-9]+')->name('pinjam');
 
 Route::post('/pinjaman/{id}/kembali', function (int $id) {
     $user = current_user();
 
-    if (!$user) {
+    if (! $user) {
         return redirect('/login');
     }
 
@@ -225,7 +228,7 @@ Route::post('/pinjaman/{id}/kembali', function (int $id) {
         }
     }
 
-    if (!$ditemukan) {
+    if (! $ditemukan) {
         return back()->with('galat', 'Peminjaman tidak ditemukan.');
     }
 
@@ -243,7 +246,7 @@ Route::post('/pinjaman/{id}/kembali', function (int $id) {
 Route::get('/admin', function () {
     $user = current_user();
 
-    if (!$user) {
+    if (! $user) {
         return redirect('/login');
     }
     if ($user['role'] !== 'admin') {
@@ -271,7 +274,7 @@ Route::get('/admin', function () {
 Route::get('/admin/buku', function () {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -281,7 +284,7 @@ Route::get('/admin/buku', function () {
 Route::get('/admin/buku/create', function () {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -291,7 +294,7 @@ Route::get('/admin/buku/create', function () {
 Route::post('/admin/buku', function () {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -335,19 +338,19 @@ Route::post('/admin/buku', function () {
     ];
     mock_save_books($books);
 
-    return redirect('/admin/buku')->with('sukses', 'Buku "' . request('judul') . '" berhasil ditambahkan.');
+    return redirect('/admin/buku')->with('sukses', 'Buku "'.request('judul').'" berhasil ditambahkan.');
 })->name('admin.buku.store');
 
 Route::get('/admin/buku/{id}/edit', function (int $id) {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
     $buku = mock_buku_by_id($id);
 
-    if (!$buku) {
+    if (! $buku) {
         abort(404);
     }
 
@@ -357,7 +360,7 @@ Route::get('/admin/buku/{id}/edit', function (int $id) {
 Route::put('/admin/buku/{id}', function (int $id) {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -399,7 +402,7 @@ Route::put('/admin/buku/{id}', function (int $id) {
         }
     }
 
-    if (!$ditemukan) {
+    if (! $ditemukan) {
         abort(404);
     }
 
@@ -411,7 +414,7 @@ Route::put('/admin/buku/{id}', function (int $id) {
 Route::delete('/admin/buku/{id}', function (int $id) {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -425,7 +428,7 @@ Route::delete('/admin/buku/{id}', function (int $id) {
 Route::get('/admin/peminjaman', function () {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -437,7 +440,7 @@ Route::get('/admin/peminjaman', function () {
 Route::post('/admin/peminjaman/{id}/kembali', function (int $id) {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -447,6 +450,7 @@ Route::post('/admin/peminjaman/{id}/kembali', function (int $id) {
         if ($loan['id'] === $id && $loan['status'] === 'dipinjam') {
             $loans[$i]['status'] = 'dikembalikan';
             mock_save_peminjaman($loans);
+
             return back()->with('sukses', 'Peminjaman ditandai sudah dikembalikan.');
         }
     }
@@ -457,7 +461,7 @@ Route::post('/admin/peminjaman/{id}/kembali', function (int $id) {
 Route::post('/admin/peminjaman/{id}/terlambat', function (int $id) {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 
@@ -467,6 +471,7 @@ Route::post('/admin/peminjaman/{id}/terlambat', function (int $id) {
         if ($loan['id'] === $id && $loan['status'] === 'dipinjam') {
             $loans[$i]['status'] = 'terlambat';
             mock_save_peminjaman($loans);
+
             return back()->with('sukses', 'Peminjaman ditandai terlambat.');
         }
     }
@@ -477,7 +482,7 @@ Route::post('/admin/peminjaman/{id}/terlambat', function (int $id) {
 Route::get('/admin/anggota', function () {
     $user = current_user();
 
-    if (!$user || $user['role'] !== 'admin') {
+    if (! $user || $user['role'] !== 'admin') {
         return redirect('/login');
     }
 

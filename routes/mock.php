@@ -4,7 +4,6 @@
  * Data mock untuk frontend-only (tidak ada database).
  * State yang bisa berubah (buku, peminjaman, pengguna) disimpan di session.
  */
-
 function mock_books(): array
 {
     return [
@@ -49,25 +48,28 @@ function mock_peminjaman(): array
 
 function mock_books_state(): array
 {
-    if (!session()->has('mock_books')) {
+    if (! session()->has('mock_books')) {
         session(['mock_books' => mock_books()]);
     }
+
     return session('mock_books');
 }
 
 function mock_pengguna_state(): array
 {
-    if (!session()->has('mock_pengguna')) {
+    if (! session()->has('mock_pengguna')) {
         session(['mock_pengguna' => mock_pengguna()]);
     }
+
     return session('mock_pengguna');
 }
 
 function mock_peminjaman_state(): array
 {
-    if (!session()->has('mock_peminjaman')) {
+    if (! session()->has('mock_peminjaman')) {
         session(['mock_peminjaman' => mock_peminjaman()]);
     }
+
     return session('mock_peminjaman');
 }
 
@@ -98,6 +100,7 @@ function mock_buku_by_id(int $id): ?array
             return $buku;
         }
     }
+
     return null;
 }
 
@@ -108,6 +111,7 @@ function mock_pengguna_by_id(int $id): ?array
             return $user;
         }
     }
+
     return null;
 }
 
@@ -118,6 +122,7 @@ function mock_peminjaman_by_id(int $id): ?array
             return $loan;
         }
     }
+
     return null;
 }
 
@@ -129,6 +134,7 @@ function mock_jumlah_dipinjam(int $bukuId): int
             $count++;
         }
     }
+
     return $count;
 }
 
@@ -143,6 +149,7 @@ function mock_next_id(array $items): int
     foreach ($items as $item) {
         $max = max($max, $item['id']);
     }
+
     return $max + 1;
 }
 
@@ -152,6 +159,7 @@ function mock_kategoris(): array
     foreach (mock_books_state() as $buku) {
         $kategori[$buku['kategori']] = true;
     }
+
     return array_keys($kategori);
 }
 
@@ -179,5 +187,6 @@ function mock_tanggal(string $tanggal): string
 {
     $bulan = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     $ts = strtotime($tanggal);
-    return date('j', $ts) . ' ' . $bulan[(int) date('n', $ts)] . ' ' . date('Y', $ts);
+
+    return date('j', $ts).' '.$bulan[(int) date('n', $ts)].' '.date('Y', $ts);
 }
