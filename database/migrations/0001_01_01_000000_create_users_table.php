@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('nis')->unique()->nullable(); // Kosong jika admin
+            $table->string('kelas')->nullable();
             $table->string('email')->unique();
+            $table->enum('role', ['admin', 'petugas', 'siswa'])->default('siswa');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
@@ -35,6 +38,7 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+        
     }
 
     /**

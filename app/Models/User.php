@@ -20,6 +20,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'nis',
+        'kelas',
+        'role',
         'email',
         'password',
     ];
@@ -46,4 +49,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+        /**
+     * Relasi ke data peminjaman buku oleh user/siswa.
+     */
+    public function peminjamans()
+    {
+        return $this->hasMany(Peminjaman::class);
+    }
+
 }
